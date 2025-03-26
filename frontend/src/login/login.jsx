@@ -1,44 +1,61 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Swal from "sweetalert2"; // Import SweetAlert2
 import "./login.css";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const validateForm = (event) => {
-    event.preventDefault(); // Prevent form submission from refreshing the page
-    let isValid = true;
+  const validateForm = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
 
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-    // Validate email format
     if (!emailPattern.test(email)) {
-      setEmailError("Invalid Email Format");
-      isValid = false;
-    } else {
-      setEmailError("");
+      Swal.fire("Invalid Email", "Please enter a valid email format!", "error");
+      setIsSubmitting(false);
+      return;
     }
 
-    // Validate password format
     if (!passwordPattern.test(password)) {
-      setPasswordError(
-        "Password must be at least 8 characters, contain uppercase, lowercase, a number, and a special character."
+      Swal.fire(
+        "Weak Password",
+        "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.",
+        "error"
       );
-      isValid = false;
-    } else {
-      setPasswordError("");
+      setIsSubmitting(false);
+      return;
     }
 
-    // If everything is valid, navigate to the home page
-    if (isValid) {
-      // For demonstration purposes, you can navigate to /home
-      navigate("/home");
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/login",
+        { email, password },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      if (response.data.success) {
+        Swal.fire("Login Successful", "Welcome back!", "success").then(() => {
+          navigate("/home");
+        });
+      } else {
+        Swal.fire("Login Failed", response.data.message || "Invalid credentials!", "error");
+      }
+    } catch (error) {
+      Swal.fire(
+        "Error",
+        error.response?.data?.message || "Something went wrong. Please try again!",
+        "error"
+      );
     }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -55,9 +72,7 @@ export const Login = () => {
       </nav>
 
       <div className="login-container">
-        <button className="close-btn" onClick={() => navigate("/home")}>
-          X
-        </button>
+        <button className="close-btn" onClick={() => navigate("/home")}>X</button>
         <h2>Login Now</h2>
         <form onSubmit={validateForm}>
           <input
@@ -65,18 +80,20 @@ export const Login = () => {
             placeholder="Email ID"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
-          {emailError && <div className="error">{emailError}</div>}
 
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
-          {passwordError && <div className="error">{passwordError}</div>}
 
-          <button type="submit">Login</button>
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Login"}
+          </button>
         </form>
 
         <div className="forgot-password">
