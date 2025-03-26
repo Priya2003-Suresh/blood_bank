@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2"; // Import SweetAlert2
+import timeImage from "../image/1.jpg"
 import "./login.css";
 
 export const Login = () => {

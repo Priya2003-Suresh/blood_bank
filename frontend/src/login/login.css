@@ -1,10 +1,33 @@
 /* Background and full-page layout */
 body {
     font-family: Arial, sans-serif;
-    /* background: url('../image/1.jpg') no-repeat center center/cover; */
-    height: 100vh;
+    background: url('../image/1.jpg') no-repeat center center/cover; 
+    height:100vh;
     margin: 0;
 }
+
+.login-page {
+    background-image: url("../image/1.jpg"); /* Path to your image */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  input[type="email"],input[type="password"] {
+  width: 100%; /* Ensures both input fields are the same width */
+  padding: 12px; /* Consistent padding */
+  font-size: 16px; /* Ensures uniform font size */
+  border: 1px solid #ccc; /* Same border style */
+  border-radius: 5px; /* Rounded corners */
+  box-sizing: border-box; /* Ensures padding doesn't affect width */
+  display: block; /* Ensures they are block elements */
+}
+
+
+  
 
 /* Navigation bar */
 nav {
