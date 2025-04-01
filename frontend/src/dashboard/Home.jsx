@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
-import "./Home.css"; // Assuming you use an external CSS file
+import "./Home.css"; // Import CSS
 
-export const images = ["1.jpg", "banner1.jpg", "3.jpg", "banner2.jpg"];
+export const images = [
+  process.env.PUBLIC_URL + "/1.jpg",
+  process.env.PUBLIC_URL + "/banner1.jpg",
+  process.env.PUBLIC_URL + "/3.jpg",
+  process.env.PUBLIC_URL + "/banner2.jpg",
+];
 
 const Home = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
