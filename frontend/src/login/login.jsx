@@ -110,9 +110,9 @@ export const Login = () => {
           </button>
         </form>
 
-        <div className="forgot-password">
+        {/* <div className="forgot-password">
           <a href="/forgot">Forgot your password?</a>
-        </div>
+        </div> */}
         <div className="create-account">
           <a href="/register">Don't have an account? Sign Up</a>
         </div>
