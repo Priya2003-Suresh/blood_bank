@@ -35,26 +35,39 @@ export const Login = () => {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/login",
-        { email, password },
-        { headers: { "Content-Type": "application/json" } }
-      );
+      const response = await axios.post('http://localhost:5000/api/auth/login', { email, password }, { withCredentials: true });
 
-      if (response.data.success) {
-        Swal.fire("Login Successful", "Welcome back!", "success").then(() => {
-          navigate("/home");
-        });
-      } else {
-        Swal.fire("Login Failed", response.data.message || "Invalid credentials!", "error");
-      }
-    } catch (error) {
-      Swal.fire(
-        "Error",
-        error.response?.data?.message || "Something went wrong. Please try again!",
-        "error"
-      );
-    }
+      console.log("Login Response:", response.data); // Debugging
+    
+            if (response.data.success) {
+                const { token, user } = response.data;
+    
+                // Store auth token and user details
+                localStorage.setItem("authToken", token);
+                localStorage.setItem("user", JSON.stringify(user));
+    
+                
+    
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Login Successful',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    navigate("/home");
+                });
+            }
+        } catch (error) {
+            console.error("Login Error:", error.response?.data);  // Debugging
+    
+            Swal.fire({
+                icon: 'error',
+                title: 'Login Failed',
+                text: error.response?.data?.message || 'Invalid Email or Password',
+                confirmButtonText: 'OK',
+            });
+        }
+    
 
     setIsSubmitting(false);
   };

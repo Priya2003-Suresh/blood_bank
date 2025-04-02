@@ -1,19 +1,20 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import "./RegisterationForm.css";
 
 const RegisterForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    fullname: "",
-    phone: "",
+    fullName: "",
+    phoneNumber: "",
     email: "",
     age: "",
     gender: "",
-    blood: "",
+    bloodGroup: "",
     address: "",
-    message: "",
     password: ""
   });
-  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -21,30 +22,46 @@ const RegisterForm = () => {
 
   const validateForm = (e) => {
     e.preventDefault();
-    const { fullname, phone, email, password, age, gender, blood, address } = formData;
+    const { fullName, phoneNumber, email, password, age, gender, bloodGroup, address } = formData;
 
-    if (fullname.length < 3) return alert("Full Name must be at least 3 characters.");
-    if (!/^[0-9]{10}$/.test(phone)) return alert("Phone number must be exactly 10 digits.");
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) return alert("Invalid email address.");
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) return alert("Password must include uppercase, lowercase, number, and special character.");
-    if (age < 18) return alert("You must be at least 18 years old.");
-    if (!gender || !blood || !address.trim()) return alert("Please fill out all required fields.");
+    if (fullName.length < 3) return Swal.fire("Error", "Full Name must be at least 3 characters.", "error");
+    if (!/^[0-9]{10}$/.test(phoneNumber)) return Swal.fire("Error", "Phone number must be exactly 10 digits.", "error");
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) return Swal.fire("Error", "Invalid email address.", "error");
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) return Swal.fire("Error", "Password must include uppercase, lowercase, number, and special character.", "error");
+    if (age < 18) return Swal.fire("Error", "You must be at least 18 years old.", "error");
+    if (!gender || !bloodGroup || !address.trim()) return Swal.fire("Error", "Please fill out all required fields.", "error");
 
-    setSuccess(true);
-    setTimeout(() => {
-      setSuccess(false);
-      window.location.href = "home";
-    }, 2000);
+    handleSubmit();
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong");
+      }
+
+      Swal.fire("Success", "Registration Successful! Redirecting to Login...", "success").then(() => {
+        navigate("/");
+      });
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    }
   };
 
   return (
     <div className="register-container">
-      
       <div className="form-wrapper">
         <h2>Register Now</h2>
         <form onSubmit={validateForm}>
-          <input type="text" id="fullname" placeholder="Full Name" onChange={handleChange} required />
-          <input type="text" id="phone" placeholder="Phone Number" onChange={handleChange} required />
+          <input type="text" id="fullName" placeholder="Full Name" onChange={handleChange} required />
+          <input type="text" id="phoneNumber" placeholder="Phone Number" onChange={handleChange} required />
           <input type="email" id="email" placeholder="Email ID" onChange={handleChange} required />
           <input type="number" id="age" placeholder="Age" onChange={handleChange} required />
           <select id="gender" onChange={handleChange} required>
@@ -53,7 +70,7 @@ const RegisterForm = () => {
             <option value="Female">Female</option>
             <option value="Other">Other</option>
           </select>
-          <select id="blood" onChange={handleChange} required>
+          <select id="bloodGroup" onChange={handleChange} required>
             <option value="">Select Blood Group</option>
             <option value="A+">A+</option>
             <option value="A-">A-</option>
@@ -65,11 +82,9 @@ const RegisterForm = () => {
             <option value="AB-">AB-</option>
           </select>
           <input type="text" id="address" placeholder="Address" onChange={handleChange} required />
-          <textarea id="message" placeholder="Any message" onChange={handleChange}></textarea>
           <input type="password" id="password" placeholder="Password" onChange={handleChange} required />
           <button type="submit" className="btn">Register</button>
         </form>
-        {success && <div className="success-popup">Registration Successful! Redirecting...</div>}
       </div>
     </div>
   );
